@@ -1,6 +1,6 @@
 {
   "name": "gamepad-cursor-mode",
-  "version-string": "0.1.10",
+  "version-string": "0.1.11",
   "builtin-baseline": "1391150599c0b9dc6f2a3c79c50eff6c94b077d1",
   "dependencies": ["directxtk", "nlohmann-json", "rapidcsv", "spdlog", "xbyak"]
 }

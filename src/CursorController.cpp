@@ -39,6 +39,14 @@ namespace GamepadCursorMode
             // is initialized. This removes the need to move a physical mouse first.
             // For those peeking through, I found that if I didn't do this, I had to jiggle my mouse in order for the plugin to work lol.
             QueueMouseMove(1, 0);
+        } else {
+            // Drop any final cursor-mode delta before gameplay resumes. Without
+            // this reset Skyrim can apply that delta to the player camera.
+            SKSE::GetTaskInterface()->AddTask([]() {
+                if (auto* manager = RE::BSInputDeviceManager::GetSingleton()) {
+                    manager->ReinitializeMouse();
+                }
+            });
         }
     }
 
@@ -199,6 +207,7 @@ namespace GamepadCursorMode
             }
             const auto settings = Config::GetSingleton().Get();
             const auto toggleDown = connected && (state.Gamepad.wButtons & settings.toggleButton) != 0;
+            const auto escapeDown = connected && (state.Gamepad.wButtons & XINPUT_GAMEPAD_B) != 0;
             if (IsCursorModeActive() && !IsMenuAvailable()) {
                 SKSE::log::info("cursor mode disabled because no eligible menu is open");
                 SetCursorModeActive(false);
@@ -211,7 +220,7 @@ namespace GamepadCursorMode
                 lastToggle = now;
             }
             toggleWasDown = toggleDown;
-            if (!IsCursorModeActive() && !toggleDown) {
+            if (!IsCursorModeActive() && !toggleDown && !escapeDown) {
                 suppressGamepadInput_.store(false);
             }
 
@@ -226,6 +235,14 @@ namespace GamepadCursorMode
             }
 
             if (connected && settings.enabled && IsCursorModeActive() && IsGameWindowForeground()) {
+                if (escapeDown && !escapeWasDown) {
+                    QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, true);
+                    QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, false);
+                    SKSE::log::info("B mapped to Escape; cursor mode disabled before menu close");
+                    escapeWasDown = true;
+                    SetCursorModeActive(false);
+                    continue;
+                }
                 const auto& pad = state.Gamepad;
                 const auto rawX = settings.cursorStick == Stick::kLeft ? pad.sThumbLX : pad.sThumbRX;
                 const auto rawY = settings.cursorStick == Stick::kLeft ? pad.sThumbLY : pad.sThumbRY;
@@ -269,11 +286,6 @@ namespace GamepadCursorMode
                     QueueMouseButton(1, rightDown);
                     SKSE::log::info("native right-click {} queued", rightDown ? "down" : "up");
                 }
-                const bool escapeDown = (pad.wButtons & XINPUT_GAMEPAD_B) != 0;
-                if (escapeDown != escapeWasDown) {
-                    QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, escapeDown);
-                    SKSE::log::info("B mapped to Escape {}", escapeDown ? "down" : "up");
-                }
                 leftWasDown = leftDown;
                 rightWasDown = rightDown;
                 escapeWasDown = escapeDown;
@@ -281,10 +293,11 @@ namespace GamepadCursorMode
                 scrollRemainder = 0.0F;
                 if (leftWasDown) QueueMouseButton(0, false);
                 if (rightWasDown) QueueMouseButton(1, false);
-                if (escapeWasDown) QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, false);
                 leftWasDown = false;
                 rightWasDown = false;
-                escapeWasDown = false;
+                if (!escapeDown) {
+                    escapeWasDown = false;
+                }
             }
 
             std::this_thread::sleep_for(4ms);
