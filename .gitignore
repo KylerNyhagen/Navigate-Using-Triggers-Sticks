@@ -1,0 +1,5 @@
+build/
+.vs/
+extern/CommonLibSSE/
+package/SKSE/Plugins/*.dll
+package/SKSE/Plugins/*.pdb

@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "toggleButton": 8,
+  "cursorStick": 1,
+  "cursorSpeed": 1100.0,
+  "deadzone": 0.18,
+  "leftTriggerClicks": true,
+  "rightTriggerClicks": true
+}
