@@ -40,12 +40,20 @@ namespace GamepadCursorMode
             // For those peeking through, I found that if I didn't do this, I had to jiggle my mouse in order for the plugin to work lol.
             QueueMouseMove(1, 0);
         } else {
-            // Drop any final cursor-mode delta before gameplay resumes. Without
-            // this reset Skyrim can apply that delta to the player camera.
+            // Drop queued cursor-mode input before gameplay resumes. Without
+            // clearing the queue, Skyrim can apply a stale delta to the player
+            // camera on a later gameplay frame.
             SKSE::GetTaskInterface()->AddTask([]() {
+                if (auto* queue = RE::BSInputEventQueue::GetSingleton()) {
+                    queue->ClearInputQueue();
+                }
                 if (auto* manager = RE::BSInputDeviceManager::GetSingleton()) {
+                    if (auto* mouse = manager->GetMouse()) {
+                        mouse->ClearInputState();
+                    }
                     manager->ReinitializeMouse();
                 }
+                SKSE::log::info("Skyrim mouse input queue and device reset after cursor mode");
             });
         }
     }
@@ -236,11 +244,11 @@ namespace GamepadCursorMode
 
             if (connected && settings.enabled && IsCursorModeActive() && IsGameWindowForeground()) {
                 if (escapeDown && !escapeWasDown) {
+                    SetCursorModeActive(false);
                     QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, true);
                     QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, false);
                     SKSE::log::info("B mapped to Escape; cursor mode disabled before menu close");
                     escapeWasDown = true;
-                    SetCursorModeActive(false);
                     continue;
                 }
                 const auto& pad = state.Gamepad;

@@ -36,7 +36,7 @@ The project uses CommonLibSSE-NG from the `ng` branch.
 
 ## Current status
 
-Version 0.1.11 is a test build. B sends Escape and disables cursor mode before the menu closes, preventing the final cursor movement from reaching the gameplay camera. The left stick sends mouse-wheel input. It initializes Skyrim's mouse device when cursor mode starts and resets it when cursor mode ends. Cursor mode is available only while a menu is open and turns off when that menu closes. The default toggle is X. The plugin writes one log file: `GamepadCursorMode.log`.
+Version 0.1.12 is a test build. B clears pending cursor input, sends Escape, and disables cursor mode before the menu closes, preventing a delayed cursor movement from reaching the gameplay camera. The left stick sends mouse-wheel input. It initializes Skyrim's mouse device when cursor mode starts and resets it when cursor mode ends. Cursor mode is available only while a menu is open and turns off when that menu closes. The default toggle is X. The plugin writes one log file: `GamepadCursorMode.log`.
 
 ## License
 
