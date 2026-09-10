@@ -252,8 +252,10 @@ namespace GamepadCursorMode
                     continue;
                 }
                 const auto& pad = state.Gamepad;
-                const auto rawX = settings.cursorStick == Stick::kLeft ? pad.sThumbLX : pad.sThumbRX;
-                const auto rawY = settings.cursorStick == Stick::kLeft ? pad.sThumbLY : pad.sThumbRY;
+                const auto cursorStick = settings.cursorStick;
+                const auto scrollStick = cursorStick == Stick::kLeft ? Stick::kRight : Stick::kLeft;
+                const auto rawX = cursorStick == Stick::kLeft ? pad.sThumbLX : pad.sThumbRX;
+                const auto rawY = cursorStick == Stick::kLeft ? pad.sThumbLY : pad.sThumbRY;
                 const auto x = ApplyDeadzone(static_cast<float>(rawX) / 32767.0F, settings.deadzone);
                 const auto y = ApplyDeadzone(static_cast<float>(rawY) / 32767.0F, settings.deadzone);
                 const auto dx = static_cast<LONG>(x * settings.cursorSpeed * elapsed);
@@ -268,10 +270,12 @@ namespace GamepadCursorMode
                     }
                 }
 
-                // The left stick is an independent scroll wheel. Accumulation makes
-                // small stick movements smooth while still producing discrete wheel
-                // notches for Scaleform and custom menu frameworks.
-                const auto scrollInput = ApplyDeadzone(static_cast<float>(pad.sThumbLY) / 32767.0F, settings.deadzone);
+                // The stick that is not assigned to the cursor is an independent
+                // scroll wheel. Accumulation makes small stick movements smooth
+                // while still producing discrete wheel notches for Scaleform and
+                // custom menu frameworks.
+                const auto rawScrollY = scrollStick == Stick::kLeft ? pad.sThumbLY : pad.sThumbRY;
+                const auto scrollInput = ApplyDeadzone(static_cast<float>(rawScrollY) / 32767.0F, settings.deadzone);
                 scrollRemainder += scrollInput * elapsed * 10.0F;
                 auto notches = static_cast<std::int32_t>(scrollRemainder);
                 if (notches != 0) {
@@ -279,7 +283,7 @@ namespace GamepadCursorMode
                     scrollRemainder -= static_cast<float>(notches);
                     QueueMouseWheel(notches);
                     if (now >= nextScrollLog) {
-                        SKSE::log::info("left-stick scroll: notches={}", notches);
+                        SKSE::log::info("{}-stick scroll: notches={}", scrollStick == Stick::kLeft ? "left" : "right", notches);
                         nextScrollLog = now + 1s;
                     }
                 }

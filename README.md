@@ -2,9 +2,32 @@
 
 Navigate Using Triggers & Sticks lets you control the mouse pointer with a gamepad while Skyrim is running. It is intended for custom mod menus that expect mouse input and provide limited (or most of the time no) gamepad support.
 
-Open a menu, then press X to turn cursor mode on or off. The toggle does nothing during normal gameplay, I tried to make sure it only works in the menus. While the mode is active, move the pointer with the right stick. Use the left stick to scroll. B sends Escape and closes the current menu. The left trigger sends a left-click. The right trigger sends a right-click. Cursor mode turns off when you close the menu, but you'll probably have to just press X to toggle it off before exiting.
+Open a menu, then press X to turn cursor mode on or off. The toggle does nothing during normal gameplay, I tried to make sure it only works in the menus. While the mode is active, move the pointer with the selected cursor stick. The other stick sends mouse-wheel input. B sends Escape and closes the current menu. The left trigger sends a left-click. The right trigger sends a right-click. Cursor mode turns off when you close the menu, but you'll probably have to just press X to toggle it off before exiting.
 
 You can change the toggle button, stick, speed, deadzone, and trigger actions in SKSE Menu Framework. The plugin still works if SKSE Menu Framework is not installed. In that case, edit `Data/SKSE/Plugins/GamepadCursorMode.json`.
+
+### JSON button and stick values
+
+The JSON file must remain valid JSON, so do not add `//` comments inside it. The button masks for `toggleButton` are:
+
+| Button | Value |
+| --- | ---: |
+| D-pad Up | 1 |
+| D-pad Down | 2 |
+| D-pad Left | 4 |
+| D-pad Right | 8 |
+| Start | 16 |
+| Back | 32 |
+| Left Stick (click) | 64 |
+| Right Stick (click) | 128 |
+| Left Bumper | 256 |
+| Right Bumper | 512 |
+| A | 4096 |
+| B | 8192 |
+| X | 16384 |
+| Y | 32768 |
+
+Set `cursorStick` to `0` for left-stick movement and right-stick scrolling, or `1` for right-stick movement and left-stick scrolling (the default).
 
 ## Requirements
 
@@ -36,7 +59,7 @@ The project uses CommonLibSSE-NG from the `ng` branch.
 
 ## Current status
 
-Version 0.1.12 is a test build. B clears pending cursor input, sends Escape, and disables cursor mode before the menu closes, preventing a delayed cursor movement from reaching the gameplay camera. The left stick sends mouse-wheel input. It initializes Skyrim's mouse device when cursor mode starts and resets it when cursor mode ends. Cursor mode is available only while a menu is open and turns off when that menu closes. The default toggle is X. The plugin writes one log file: `GamepadCursorMode.log`.
+Version 0.1.13 is a test build. The Cursor Stick setting now assigns the other stick to scrolling, so left-stick movement uses the right stick for scrolling. B clears pending cursor input, sends Escape, and disables cursor mode before the menu closes, preventing a delayed cursor movement from reaching the gameplay camera. It initializes Skyrim's mouse device when cursor mode starts and resets it when cursor mode ends. Cursor mode is available only while a menu is open and turns off when that menu closes. The default toggle is X. The plugin writes one log file: `GamepadCursorMode.log`.
 
 ## License
 

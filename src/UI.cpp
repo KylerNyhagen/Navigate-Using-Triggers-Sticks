@@ -50,6 +50,7 @@ namespace GamepadCursorMode::UI
                 settings.cursorStick = stick == 0 ? Stick::kLeft : Stick::kRight;
                 changed = true;
             }
+            UI::Style::Hint("The other stick sends mouse-wheel input.");
             changed |= ImGui::SliderFloat("Cursor Speed", &settings.cursorSpeed, 100.0F, 3000.0F, "%.0f pixels/second");
             changed |= ImGui::SliderFloat("Stick Deadzone", &settings.deadzone, 0.0F, 0.9F, "%.2f");
             changed |= ImGui::Checkbox("Left Trigger Sends Left-click", &settings.leftTriggerClicks);
