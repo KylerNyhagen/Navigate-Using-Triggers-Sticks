@@ -145,6 +145,16 @@ namespace GamepadCursorMode
         });
     }
 
+    void CursorController::QueueKeyboardButton(std::uint32_t a_key, bool a_down)
+    {
+        SKSE::GetTaskInterface()->AddTask([a_key, a_down]() {
+            if (auto* queue = RE::BSInputEventQueue::GetSingleton()) {
+                queue->AddButtonEvent(RE::INPUT_DEVICE::kKeyboard, static_cast<std::int32_t>(a_key),
+                    a_down ? 1.0F : 0.0F, a_down ? 0.0F : 0.01F);
+            }
+        });
+    }
+
     void CursorController::Run(std::stop_token a_stopToken)
     {
         using clock = std::chrono::steady_clock;
@@ -152,6 +162,7 @@ namespace GamepadCursorMode
         bool toggleWasDown = false;
         bool leftWasDown = false;
         bool rightWasDown = false;
+        bool escapeWasDown = false;
         int activeController = -1;
         auto nextStatusLog = clock::now();
         auto nextMovementLog = clock::now();
@@ -258,14 +269,22 @@ namespace GamepadCursorMode
                     QueueMouseButton(1, rightDown);
                     SKSE::log::info("native right-click {} queued", rightDown ? "down" : "up");
                 }
+                const bool escapeDown = (pad.wButtons & XINPUT_GAMEPAD_B) != 0;
+                if (escapeDown != escapeWasDown) {
+                    QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, escapeDown);
+                    SKSE::log::info("B mapped to Escape {}", escapeDown ? "down" : "up");
+                }
                 leftWasDown = leftDown;
                 rightWasDown = rightDown;
+                escapeWasDown = escapeDown;
             } else {
                 scrollRemainder = 0.0F;
                 if (leftWasDown) QueueMouseButton(0, false);
                 if (rightWasDown) QueueMouseButton(1, false);
+                if (escapeWasDown) QueueKeyboardButton(RE::BSKeyboardDevice::Keys::kEscape, false);
                 leftWasDown = false;
                 rightWasDown = false;
+                escapeWasDown = false;
             }
 
             std::this_thread::sleep_for(4ms);

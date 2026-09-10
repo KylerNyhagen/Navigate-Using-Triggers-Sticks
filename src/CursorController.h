@@ -21,6 +21,7 @@ namespace GamepadCursorMode
         void QueueMouseMove(LONG a_dx, LONG a_dy);
         static void QueueMouseWheel(std::int32_t a_notches);
         static void QueueMouseButton(std::uint32_t a_button, bool a_down);
+        static void QueueKeyboardButton(std::uint32_t a_key, bool a_down);
 
         std::jthread worker_;
         std::atomic_bool active_{ false };

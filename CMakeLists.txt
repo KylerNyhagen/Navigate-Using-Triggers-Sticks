@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(GamepadCursorMode VERSION 0.1.9 LANGUAGES CXX)
+project(GamepadCursorMode VERSION 0.1.10 LANGUAGES CXX)
 
 option(ENABLE_SKYRIM_SE "Build for Skyrim 1.5.x" OFF)
 option(ENABLE_SKYRIM_AE "Build for Skyrim 1.6.x" ON)
