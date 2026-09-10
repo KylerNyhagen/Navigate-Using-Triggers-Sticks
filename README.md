@@ -8,7 +8,7 @@ You can change the toggle button, stick, speed, deadzone, and trigger actions in
 
 ### JSON button and stick values
 
-The JSON file must remain valid JSON, so do not add `//` comments inside it. The button masks for `toggleButton` are:
+These correspond to the json values in case you feel like editing the json instead. This isn't needed for SKSE Menu Framework. 
 
 | Button | Value |
 | --- | ---: |
