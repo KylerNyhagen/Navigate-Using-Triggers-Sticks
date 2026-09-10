@@ -1,0 +1,5 @@
+{
+  "name": "gamepad-cursor-mode",
+  "version-string": "0.1.9",
+  "dependencies": ["directxtk", "nlohmann-json", "rapidcsv", "spdlog", "xbyak"]
+}
